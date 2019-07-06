@@ -83,3 +83,8 @@ Currency('ripple', ticker='xrp', validator='Base58Check',
 Currency('ethereum', ticker='eth', validator='Ethereum')
 Currency('ether-zero', ticker='etz', validator='Ethereum')
 Currency('ethereum-classic', ticker='etc', validator='Ethereum')
+Currency('monero', ticker='xmr', validator='Monero',
+         networks=dict(
+             main=(0x12, 0x2a), main_integrated=(0x13,),
+             test=(0x35, 0x3f), test_integrated=(0x36,),
+             stage=(0x18, 0x24), stage_integrated=(0x19,)))

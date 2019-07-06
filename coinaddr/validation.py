@@ -11,6 +11,7 @@ import re
 from hashlib import sha256
 import functools
 import operator
+from binascii import unhexlify
 
 from zope.interface import implementer, provider
 import attr
@@ -23,6 +24,7 @@ from .interfaces import (
     )
 from .base import NamedSubclassContainerBase
 from . import currency
+from coinaddr import base58_xmr
 
 
 @provider(INamedSubclassContainer)
@@ -128,6 +130,45 @@ class EthereumValidator(ValidatorBase):
     def network(self):
         """Return network derived from network version bytes."""
         return 'both'
+
+
+@attr.s(frozen=True, slots=True, cmp=False)
+@implementer(IValidator)
+class MoneroValidator(ValidatorBase):
+    """Validates monero based cryptocurrency addresses."""
+
+    name = 'Monero'
+    address_regex = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{95}$')
+    integrated_address_regex = re.compile(r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{106}$')
+
+    @staticmethod
+    def decode(address):
+        """Return tuple (netbyte, valid checksum)"""
+        decoded = bytearray(unhexlify(base58_xmr.decode(address)))
+        return decoded[0], decoded[-4:] == sha3.keccak_256(decoded[:-4]).digest()[:4]
+
+    def validate(self):
+        """Validate the address"""
+        address = self.request.address.decode()
+        if self.address_regex.match(address):
+            netbyte, valid = self.decode(address)
+            return (netbyte in (self.request.currency.networks['main'] +
+                                self.request.currency.networks['test'] +
+                                self.request.currency.networks['stage'])) and valid
+        elif self.integrated_address_regex.match(address):
+            netbyte, valid = self.decode(address)
+            return (netbyte in (self.request.currency.networks['main_integrated'] +
+                                self.request.currency.networks['test_integrated'] +
+                                self.request.currency.networks['stage_integrated'])) and valid
+        return False
+
+    @property
+    def network(self):
+        """Return network derived from network version bytes"""
+        netbyte, valid = self.decode(self.request.address.decode())
+        for name, networks in self.request.currency.networks.items():
+            if netbyte in networks:
+                return name
 
 
 @attr.s(frozen=True, slots=True, cmp=False)
