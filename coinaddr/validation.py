@@ -23,8 +23,8 @@ from .interfaces import (
     IValidationResult, ICurrency
     )
 from .base import NamedSubclassContainerBase
-from . import currency
-from coinaddr import base58_xmr
+from . import currency, base58_xmr
+from .exceptions import CoinaddrException
 
 
 @provider(INamedSubclassContainer)
@@ -205,13 +205,16 @@ class ValidationRequest:
     def execute(self):
         """Execute this request and return the result."""
         validator = Validators.get(self.currency.validator)(self)
-        return ValidationResult(
-            name=self.currency.name,
-            ticker=self.currency.ticker,
-            address=self.address,
-            valid=validator.validate(),
-            network=validator.network
-            )
+        try:
+            return ValidationResult(
+                name=self.currency.name,
+                ticker=self.currency.ticker,
+                address=self.address,
+                valid=validator.validate(),
+                network=validator.network
+                )
+        except Exception as e:
+            raise CoinaddrException(e)
 
 
 @attr.s(frozen=True, slots=True, cmp=False)
