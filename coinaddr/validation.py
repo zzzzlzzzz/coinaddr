@@ -120,8 +120,8 @@ class EthereumValidator(ValidatorBase):
         addr_hash = sha3.keccak_256(addr.lower().encode('ascii')).hexdigest()
         for i in range(0, len(addr)):
             if any([
-                    int(addr_hash[i], 16) >= 8 and not addr[i].isupper(),
-                    int(addr_hash[i], 16) < 8 and not addr[i].islower()
+                    int(addr_hash[i], 16) > 7 and addr[i].upper() != addr[i],
+                    int(addr_hash[i], 16) <= 7 and addr[i].lower() != addr[i]
             ]):
                 return False
         return True
