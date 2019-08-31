@@ -116,12 +116,12 @@ class EthereumValidator(ValidatorBase):
         if any(bool(pat.match(address))
                for pat in self.non_checksummed_patterns):
             return True
-        addr = address.lstrip('0x')
+        addr = address[2:] if address.startswith('0x') else address
         addr_hash = sha3.keccak_256(addr.lower().encode('ascii')).hexdigest()
-        for i in range(0, len(addr)):
+        for i, letter in enumerate(addr):
             if any([
-                    int(addr_hash[i], 16) > 7 and addr[i].upper() != addr[i],
-                    int(addr_hash[i], 16) <= 7 and addr[i].lower() != addr[i]
+                    int(addr_hash[i], 16) >= 8 and letter.upper() != letter,
+                    int(addr_hash[i], 16) < 8 and letter.lower() != letter
             ]):
                 return False
         return True
