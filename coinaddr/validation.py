@@ -24,6 +24,7 @@ from .interfaces import (
     )
 from .base import NamedSubclassContainerBase
 from . import currency, base58_xmr
+from .segwit_addr import bech32_decode
 from .exceptions import CoinaddrException
 
 
@@ -98,6 +99,29 @@ class Base58CheckValidator(ValidatorBase):
         for name, networks in self.request.currency.networks.items():
             if nbyte in networks:
                 return name
+        return 'unknown'
+
+
+@attr.s(frozen=True, slots=True, cmp=False)
+@implementer(IValidator)
+class SegWitValidator(ValidatorBase):
+    """Validates SegWit based cryptocurrency addresses."""
+
+    name = 'SegWitCheck'
+
+    def validate(self):
+        """Validate the address."""
+        hrp, data = bech32_decode(self.request.address.decode())
+        return bool(hrp) and bool(data)
+
+    @property
+    def network(self):
+        """Return network derived from network version bytes."""
+        hrp, data = bech32_decode(self.request.address.decode())
+        for name, networks in self.request.currency.networks.items():
+            if hrp in networks:
+                return name
+        return 'unknown'
 
 
 @attr.s(frozen=True, slots=True, cmp=False)
@@ -169,6 +193,7 @@ class MoneroValidator(ValidatorBase):
         for name, networks in self.request.currency.networks.items():
             if netbyte in networks:
                 return name
+        return 'unknown'
 
 
 @attr.s(frozen=True, slots=True, cmp=False)
