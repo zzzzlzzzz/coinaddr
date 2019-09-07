@@ -104,3 +104,5 @@ Currency('monero', ticker='xmr', validator='Monero',
              main=(0x12, 0x2a), main_integrated=(0x13,),
              test=(0x35, 0x3f), test_integrated=(0x36,),
              stage=(0x18, 0x24), stage_integrated=(0x19,)))
+Currency('binance', ticker='bnb', validator='SegWitCheck',
+         networks=dict(both=('bnb', )))

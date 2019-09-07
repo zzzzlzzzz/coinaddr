@@ -32,7 +32,9 @@ TEST_DATA = [
      b'0x900ff070d37657cdf8016bca0d60cb493ebf7f83', 'both'),
     ('ethereum', 'eth', b'900Ff070D37657cdF8016BcA0D60CB493EBf7f83', 'both'),
     ('ethereum-classic', 'etc',
-     b'0x900Ff070D37657cdF8016BcA0D60CB493EBf7f83', 'both')
+     b'0x900Ff070D37657cdF8016BcA0D60CB493EBf7f83', 'both'),
+    ('binance', 'bnb', b'bnb1usaafxe5tunqx0wmgv8dcq0meujlvq6fyfvw5d', 'both'),
+    ('binance', 'bnb', b'bnb1p43f9ft5jzpl9n4w7h2nzjuwfzhfwhm0h9q94e', 'both'),
 ]
 
 
